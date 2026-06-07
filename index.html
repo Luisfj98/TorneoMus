@@ -328,7 +328,8 @@
       border: 6px solid transparent;
       border-top-color: #f4c430;
     }
-    .has-tooltip:hover .tooltip { display: block; }
+    .has-tooltip:hover .tooltip,
+    .has-tooltip.open   .tooltip { display: block; }
     .tooltip-row { display: flex; justify-content: space-between; gap: 8px; }
     .tooltip-sep { border-top: 1px solid #2a4a2a; margin: 6px 0; }
     .tooltip-total { color: #f4c430; font-weight: 700; }
@@ -719,6 +720,15 @@
     }
     return names;
   }
+
+  // Tooltip táctil
+  document.addEventListener('click', e => {
+    const tip = e.target.closest('.has-tooltip');
+    document.querySelectorAll('.has-tooltip.open').forEach(el => {
+      if (el !== tip) el.classList.remove('open');
+    });
+    if (tip) tip.classList.toggle('open');
+  });
 
   function showError(msg) {
     const el = document.getElementById('errorMsg');
