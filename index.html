@@ -31,77 +31,6 @@
       margin-bottom: 36px;
     }
 
-    .header-photo {
-      width: 100%;
-      max-width: 960px;
-      max-height: 280px;
-      object-fit: cover;
-      object-position: center 40%;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.6);
-      border: 2px solid rgba(200,185,122,0.4);
-    }
-
-    .cards-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    /* Carta de baraja española */
-    .carta {
-      width: 48px;
-      height: 68px;
-      background: #fffdf5;
-      border-radius: 6px;
-      border: 1.5px solid #c8b97a;
-      box-shadow: 2px 3px 8px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      gap: 2px;
-    }
-
-    .carta .palo {
-      font-size: 1.4rem;
-      line-height: 1;
-    }
-
-    .carta .num {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #222;
-      line-height: 1;
-    }
-
-    .carta .num-tl {
-      position: absolute;
-      top: 3px;
-      left: 5px;
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #222;
-    }
-
-    .carta .num-br {
-      position: absolute;
-      bottom: 3px;
-      right: 5px;
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #222;
-      transform: rotate(180deg);
-    }
-
-    .carta.roja .palo { color: #c0392b; }
-    .carta.roja .num-tl,
-    .carta.roja .num-br { color: #c0392b; }
-    .carta.negra .palo { color: #1a1a1a; }
-
     h1 {
       font-size: 2.2rem;
       color: #f4c430;
@@ -116,7 +45,7 @@
       font-size: 0.9rem;
     }
 
-    /* ── Cards (secciones) ── */
+    /* ── Secciones ── */
     .card {
       background: rgba(10, 35, 10, 0.75);
       border: 1px solid rgba(120, 180, 80, 0.35);
@@ -145,6 +74,7 @@
 
     @media (max-width: 640px) {
       .inputs-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.6rem; letter-spacing: 1px; }
     }
 
     label {
@@ -198,6 +128,7 @@
 
     .results { display: none; }
 
+    /* ── Stats ── */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -224,8 +155,11 @@
       margin-top: 4px;
     }
 
-    /* Bebida / Totales */
+    /* ── Tablas responsive ── */
     .drinks-table { width: 100%; border-collapse: collapse; }
+
+    .drinks-table thead { display: table-header-group; }
+
     .drinks-table th {
       background: rgba(0,0,0,0.4);
       color: #f4c430;
@@ -234,100 +168,136 @@
       font-size: 0.85rem;
       border-bottom: 1px solid rgba(120,180,80,0.3);
     }
+
     .drinks-table td {
       padding: 10px 14px;
       border-bottom: 1px solid rgba(120,180,80,0.12);
       font-size: 0.9rem;
       color: #ddd;
     }
+
     .drinks-table tr:hover td { background: rgba(255,255,255,0.04); }
 
-    /* Bracket */
-    .bracket-container { overflow-x: auto; padding-bottom: 8px; }
+    @media (max-width: 600px) {
+      .drinks-table thead { display: none; }
 
-    .bracket {
-      display: flex;
-      gap: 0;
-      min-width: max-content;
-      align-items: stretch;
+      .drinks-table tbody tr {
+        display: block;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(120,180,80,0.2);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 4px 0;
+      }
+
+      .drinks-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        border-bottom: 1px solid rgba(120,180,80,0.08);
+        font-size: 0.82rem;
+        gap: 8px;
+      }
+
+      .drinks-table td:last-child { border-bottom: none; }
+
+      .drinks-table td::before {
+        content: attr(data-label);
+        color: #a8c89a;
+        font-size: 0.75rem;
+        font-weight: 600;
+        flex-shrink: 0;
+        max-width: 50%;
+      }
     }
 
-    .round {
-      display: flex;
-      flex-direction: column;
-      min-width: 170px;
-    }
-
-    .round-title {
-      text-align: center;
-      font-size: 0.72rem;
-      color: #f4c430;
-      font-weight: 700;
-      letter-spacing: 1px;
-      padding: 6px 0 10px;
-      text-transform: uppercase;
-    }
-
-    .round-slots {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .slot {
-      flex: 1;
+    /* ── Bracket por rondas ── */
+    .bracket-nav {
       display: flex;
       align-items: center;
-    }
-
-    .match {
-      display: flex;
-      flex-direction: column;
-      width: 155px;
-      border: 1px solid rgba(120,180,80,0.3);
-      border-radius: 6px;
-      overflow: hidden;
-      background: rgba(0,0,0,0.45);
-    }
-
-    .team {
-      padding: 7px 10px;
-      font-size: 0.78rem;
-      border-bottom: 1px solid rgba(120,180,80,0.15);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: #ddd;
-    }
-    .team:last-child { border-bottom: none; }
-    .team.tbd   { color: #4a6a4a; font-style: italic; }
-    .team.bye   { color: #5a7a5a; font-style: italic; background: rgba(0,0,0,0.2); }
-    .team.champ { color: #ffd700; font-weight: 700; }
-
-    /* Conector entre rondas */
-    .connector {
-      width: 24px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
       justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
-    .error-msg {
-      background: rgba(80,10,10,0.8);
-      border: 1px solid #a00;
+    .btn-nav {
+      all: unset;
+      cursor: pointer;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(120,180,80,0.4);
       border-radius: 8px;
-      padding: 12px 16px;
-      color: #f88;
-      text-align: center;
-      margin-bottom: 16px;
-      display: none;
-      max-width: 960px;
-      margin-left: auto;
-      margin-right: auto;
+      color: #f4c430;
+      font-size: 1.2rem;
+      padding: 8px 18px;
+      transition: background 0.15s;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 700;
+      width: auto;
+      margin: 0;
+      max-width: none;
+      display: inline-block;
+      box-shadow: none;
     }
 
-    /* Tooltip */
+    .btn-nav:hover { background: rgba(244,196,48,0.15); transform: none; }
+    .btn-nav:disabled { opacity: 0.3; cursor: default; }
+
+    .round-indicator {
+      color: #f4c430;
+      font-weight: 700;
+      font-size: 1rem;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .round-panel { display: none; }
+    .round-panel.active { display: block; }
+
+    .matches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .match-card {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(120,180,80,0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .match-card .match-num {
+      background: rgba(0,0,0,0.3);
+      color: #8aaa7a;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-bottom: 1px solid rgba(120,180,80,0.15);
+    }
+
+    .match-card .team {
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(120,180,80,0.12);
+      color: #ddd;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .match-card .team:last-child { border-bottom: none; }
+    .match-card .team.bye   { color: #5a7a5a; font-style: italic; }
+    .match-card .team.tbd   { color: #4a6a4a; font-style: italic; }
+    .match-card .team.champ { color: #ffd700; font-weight: 700; }
+    .team-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(120,180,80,0.5);
+      flex-shrink: 0;
+    }
+
+    /* ── Tooltip ── */
     .has-tooltip { position: relative; cursor: help; }
     .has-tooltip .tooltip {
       display: none;
@@ -372,6 +342,20 @@
       font-size: 0.85rem;
       margin-bottom: 14px;
     }
+
+    .error-msg {
+      background: rgba(80,10,10,0.8);
+      border: 1px solid #a00;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #f88;
+      text-align: center;
+      margin-bottom: 16px;
+      display: none;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 </head>
 <body>
@@ -415,7 +399,7 @@
 
     <div class="card">
       <h2>&#127867; Gasto estimado en bebida</h2>
-      <table class="drinks-table">
+      <table class="drinks-table" id="bebidaTable">
         <thead>
           <tr>
             <th>Hasta dónde llega la pareja</th>
@@ -433,7 +417,7 @@
       <p style="font-size:0.82rem;color:#888;margin-bottom:14px;">
         Inscripción dividida entre los 2 miembros de la pareja, más el gasto en bebida según las partidas jugadas.
       </p>
-      <table class="drinks-table">
+      <table class="drinks-table" id="totalTable">
         <thead>
           <tr>
             <th>Hasta dónde llega</th>
@@ -450,14 +434,22 @@
     <div class="card">
       <h2>&#128207; Cuadro de emparejamientos</h2>
       <div id="byeNotice" class="bye-notice" style="display:none"></div>
-      <div class="bracket-container">
-        <div class="bracket" id="bracket"></div>
+
+      <div class="bracket-nav">
+        <button class="btn-nav" id="btnPrev" onclick="cambiarRonda(-1)">&#8592; Anterior</button>
+        <div class="round-indicator" id="roundIndicator"></div>
+        <button class="btn-nav" id="btnNext" onclick="cambiarRonda(1)">Siguiente &#8594;</button>
       </div>
+
+      <div id="roundPanels"></div>
     </div>
 
   </div>
 
 <script>
+  let _currentRound = 0;
+  let _totalRounds  = 0;
+
   function getRoundLabel(r, rondas) {
     if (r === rondas) return 'Final';
     if (r === rondas - 1) return 'Semifinal';
@@ -469,7 +461,6 @@
     const breakdown = [];
     let totalBebida = 0;
 
-    // Ronda 1: solo juegan las parejas sin bye
     const r1Matches = p2 / 2 - byes;
     const r1Pairs   = r1Matches * 2;
     const r1Cost    = r1Pairs * 2 * bebida;
@@ -478,7 +469,6 @@
       totalBebida += r1Cost;
     }
 
-    // Rondas 2 en adelante: cuadro limpio, parejas se dividen a la mitad
     let activePairs = p2 / 2;
     for (let r = 2; r <= rondas; r++) {
       const cost = activePairs * 2 * bebida;
@@ -488,7 +478,6 @@
     }
 
     const gran = bote + totalBebida;
-
     const rows = breakdown.map(b =>
       `<div class="tooltip-row"><span>${b.label} (${b.pairs} parejas)</span><span>${b.cost.toFixed(2)} €</span></div>`
     ).join('');
@@ -517,14 +506,14 @@
     const inscr  = parseFloat(document.getElementById('inscripcion').value);
     const bebida = parseFloat(document.getElementById('bebidaPartida').value);
 
-    if (!n || n < 2)    { showError('Introduce al menos 2 parejas.'); return; }
+    if (!n || n < 2)       { showError('Introduce al menos 2 parejas.'); return; }
     if (!inscr || inscr <= 0) { showError('La inscripción debe ser mayor que 0.'); return; }
     hideError();
 
     const bote   = n * inscr;
-    const p2     = nextPow2(n);          // siguiente potencia de 2
-    const byes   = p2 - n;              // parejas que descansan en ronda 1
-    const rondas = Math.log2(p2);        // número total de rondas
+    const p2     = nextPow2(n);
+    const byes   = p2 - n;
+    const rondas = Math.log2(p2);
 
     // Stats
     document.getElementById('statsGrid').innerHTML = `
@@ -536,50 +525,40 @@
       ${byes > 0 ? `<div class="stat-box"><div class="value">${byes}</div><div class="label">Byes (descansan R1)</div></div>` : ''}
     `;
 
-    // Bebida — cuántas partidas juega cada pareja según hasta dónde llega
-    // Con byes: la pareja que tiene bye en R1 juega desde R2
-    // Partidas de alguien eliminado en ronda r: r partidas (o r-1 si tuvo bye)
+    // Tabla bebida
     let bebidaRows = '';
     for (let r = 1; r <= rondas; r++) {
-      // ¿Cuántas partidas jugó quien cae en esta ronda?
-      // Si tuvo bye en R1 → empieza en R2, juega rondas r-1 partidas hasta caer en ronda r
-      // Sin bye → juega r partidas
-      // Para simplificar mostramos los dos casos cuando hay byes
-      const etiqueta = r === rondas
-        ? 'Campeón (gana la final)'
-        : r === rondas - 1
-          ? 'Finalista (pierde la final)'
-          : r === rondas - 2 && rondas > 2
-            ? 'Semifinalista'
-            : `Eliminado en ronda ${r}`;
+      const etiqueta = r === rondas ? 'Campeón (gana la final)'
+        : r === rondas - 1 ? 'Finalista (pierde la final)'
+        : r === rondas - 2 && rondas > 2 ? 'Semifinalista'
+        : `Eliminado en ronda ${r}`;
 
-      const sinBye  = r;
-      const conBye  = byes > 0 ? r - 1 : null; // si hubo bye, jugó 1 menos en R1
+      const sinBye = r;
+      const conBye = byes > 0 ? r - 1 : null;
 
-      const filaSin = `<tr>
-        <td>${etiqueta}${byes > 0 ? ' (sin bye)' : ''}</td>
-        <td>${sinBye}</td>
-        <td>${(sinBye * bebida).toFixed(2)} €</td>
-        <td>${(sinBye * bebida * 2).toFixed(2)} €</td>
+      bebidaRows += `<tr>
+        <td data-label="Resultado">${etiqueta}${byes > 0 ? ' (sin bye)' : ''}</td>
+        <td data-label="Partidas">${sinBye}</td>
+        <td data-label="Por persona">${(sinBye * bebida).toFixed(2)} €</td>
+        <td data-label="Por pareja">${(sinBye * bebida * 2).toFixed(2)} €</td>
       </tr>`;
 
-      const filaCon = (conBye !== null && conBye > 0) ? `<tr>
-        <td>${etiqueta} (con bye)</td>
-        <td>${conBye}</td>
-        <td>${(conBye * bebida).toFixed(2)} €</td>
-        <td>${(conBye * bebida * 2).toFixed(2)} €</td>
-      </tr>` : '';
-
-      bebidaRows += filaSin + filaCon;
+      if (conBye !== null && conBye > 0) {
+        bebidaRows += `<tr>
+          <td data-label="Resultado">${etiqueta} (con bye)</td>
+          <td data-label="Partidas">${conBye}</td>
+          <td data-label="Por persona">${(conBye * bebida).toFixed(2)} €</td>
+          <td data-label="Por pareja">${(conBye * bebida * 2).toFixed(2)} €</td>
+        </tr>`;
+      }
     }
     document.getElementById('bebidaTbody').innerHTML = bebidaRows;
 
-    // Total por persona (inscripción/2 + bebida)
+    // Tabla total
     const inscrPorPersona = inscr / 2;
     let totalRows = '';
     for (let r = 1; r <= rondas; r++) {
-      const etiqueta = r === rondas
-        ? 'Campeón'
+      const etiqueta = r === rondas ? 'Campeón'
         : r === rondas - 1 ? 'Finalista'
         : r === rondas - 2 && rondas > 2 ? 'Semifinalista'
         : `Eliminado en ronda ${r}`;
@@ -588,11 +567,11 @@
         const beb   = partidas * bebida;
         const total = inscrPorPersona + beb;
         totalRows += `<tr>
-          <td>${label}</td>
-          <td>${inscrPorPersona.toFixed(2)} €</td>
-          <td>${beb.toFixed(2)} €</td>
-          <td><strong>${total.toFixed(2)} €</strong></td>
-          <td>${(total * 2).toFixed(2)} €</td>
+          <td data-label="Resultado">${label}</td>
+          <td data-label="Inscripción/persona">${inscrPorPersona.toFixed(2)} €</td>
+          <td data-label="Bebida/persona">${beb.toFixed(2)} €</td>
+          <td data-label="Total/persona"><strong>${total.toFixed(2)} €</strong></td>
+          <td data-label="Total/pareja">${(total * 2).toFixed(2)} €</td>
         </tr>`;
       };
 
@@ -608,7 +587,7 @@
     document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ── Bracket ──────────────────────────────────────────────────────────────
+  // ── Bracket por rondas con navegación ────────────────────────────────────
   function renderBracket(n, p2, byes, rondas) {
     const notice = document.getElementById('byeNotice');
     if (byes > 0) {
@@ -619,164 +598,124 @@
       notice.style.display = 'none';
     }
 
-    const bracket = document.getElementById('bracket');
-    bracket.innerHTML = '';
-
-    // Construir el cuadro de la ronda 1 con byes incluidos
-    // p2 / 2 huecos en R1; los primeros "byes" huecos son byes
-    const r1Size = p2 / 2; // número de partidos en R1 (incluyendo los de bye)
-
-    // Asignar parejas: primero los byes (1 pareja vs BYE), luego los partidos normales
-    // Convención: parejas 1..byes tienen bye, parejas (byes+1)..n se emparejan entre sí
     const parejas = Array.from({ length: n }, (_, i) => `Pareja ${i + 1}`);
+    const roundNames = getRoundNames(rondas);
 
-    // Generar partidos de ronda 1
+    // Construir partidos R1
     let r1Matches = [];
-    for (let i = 0; i < byes; i++) {
+    for (let i = 0; i < byes; i++)
       r1Matches.push({ t1: parejas[i], t2: 'BYE', isBye: true });
-    }
     let idx = byes;
     while (idx + 1 < n) {
       r1Matches.push({ t1: parejas[idx], t2: parejas[idx + 1], isBye: false });
       idx += 2;
     }
 
-    // Calcular altura total: cada "slot" de R1 tiene 2 equipos; las rondas siguientes doblan el alto por slot
-    // Usamos unidades de "slot height" = altura de un partido R1
-    const slotH = 56; // px por partido (2 teams * 28px aprox)
-    const totalH = r1Size * slotH;
+    // Construir todos los paneles de rondas
+    const allRounds = [];
+    allRounds.push({ name: roundNames[0], matches: r1Matches });
 
-    // Nombres de ronda
-    const roundNames = getRoundNames(rondas);
-
-    // Ronda 1
-    const round1El = makeRoundEl(roundNames[0]);
-    const slots1   = document.createElement('div');
-    slots1.className = 'round-slots';
-    slots1.style.height = totalH + 'px';
-
-    r1Matches.forEach(m => {
-      const slotEl = document.createElement('div');
-      slotEl.className = 'slot';
-      slotEl.style.height = slotH + 'px';
-
-      const matchEl = makeMatch(
-        m.t1, false,
-        m.isBye ? 'BYE' : m.t2, m.isBye
-      );
-      slotEl.appendChild(matchEl);
-
-      // Conector hacia ronda 2 (solo si no es bye o si tiene oponente real)
-      const conn = makeConnector();
-      slotEl.appendChild(conn);
-
-      slots1.appendChild(slotEl);
-    });
-    round1El.appendChild(slots1);
-    bracket.appendChild(round1El);
-
-    // Rondas 2 en adelante
-    let prevMatchCount = r1Matches.length;
+    let prevCount = r1Matches.length;
     for (let r = 1; r < rondas; r++) {
-      const matchCount = prevMatchCount / 2;
-      const roundEl   = makeRoundEl(roundNames[r]);
-      const slotsEl   = document.createElement('div');
-      slotsEl.className = 'round-slots';
-      slotsEl.style.height = totalH + 'px';
-
-      const slotHeight = totalH / matchCount;
-
-      for (let m = 0; m < matchCount; m++) {
-        const slotEl = document.createElement('div');
-        slotEl.className = 'slot';
-        slotEl.style.height = slotHeight + 'px';
-
-        const isLast = (r === rondas - 1);
-        const matchEl = makeMatch('Ganador', true, 'Ganador', true);
-        slotEl.appendChild(matchEl);
-
-        if (!isLast) {
-          slotEl.appendChild(makeConnector());
-        }
-
-        slotsEl.appendChild(slotEl);
-      }
-
-      roundEl.appendChild(slotsEl);
-      bracket.appendChild(roundEl);
-      prevMatchCount = matchCount;
+      const count = prevCount / 2;
+      const matches = Array.from({ length: count }, () => ({ t1: 'Ganador', t2: 'Ganador', isTbd: true }));
+      allRounds.push({ name: roundNames[r], matches });
+      prevCount = count;
     }
 
-    // Columna campeón
-    const champEl  = makeRoundEl('Campeón');
-    const champSl  = document.createElement('div');
-    champSl.className = 'round-slots';
-    champSl.style.height = totalH + 'px';
+    // Panel campeón
+    allRounds.push({ name: 'Campeón', matches: [{ t1: '🏆 ???', t2: null, isChamp: true }] });
 
-    const champSlot = document.createElement('div');
-    champSlot.className = 'slot';
-    champSlot.style.height = totalH + 'px';
+    _totalRounds  = allRounds.length;
+    _currentRound = 0;
 
-    const champBox = document.createElement('div');
-    champBox.className = 'match';
-    const champTeam = document.createElement('div');
-    champTeam.className = 'team champ';
-    champTeam.textContent = '🏆 ???';
-    champBox.appendChild(champTeam);
-    champSlot.appendChild(champBox);
-    champSl.appendChild(champSlot);
-    champEl.appendChild(champSl);
-    bracket.appendChild(champEl);
+    // Renderizar paneles
+    const container = document.getElementById('roundPanels');
+    container.innerHTML = '';
+
+    allRounds.forEach((round, ri) => {
+      const panel = document.createElement('div');
+      panel.className = 'round-panel' + (ri === 0 ? ' active' : '');
+      panel.id = `rp-${ri}`;
+
+      const grid = document.createElement('div');
+      grid.className = 'matches-grid';
+
+      round.matches.forEach((m, mi) => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+
+        if (!m.isChamp) {
+          const num = document.createElement('div');
+          num.className = 'match-num';
+          num.textContent = `Partido ${mi + 1}`;
+          card.appendChild(num);
+        }
+
+        const addTeam = (name, cls) => {
+          const t = document.createElement('div');
+          t.className = 'team ' + (cls || '');
+          if (!m.isChamp) {
+            const dot = document.createElement('span');
+            dot.className = 'team-dot';
+            t.appendChild(dot);
+          }
+          t.appendChild(document.createTextNode(name));
+          card.appendChild(t);
+        };
+
+        if (m.isChamp) {
+          addTeam(m.t1, 'champ');
+        } else if (m.isBye) {
+          addTeam(m.t1, '');
+          addTeam('BYE', 'bye');
+        } else if (m.isTbd) {
+          addTeam('Ganador anterior', 'tbd');
+          addTeam('Ganador anterior', 'tbd');
+        } else {
+          addTeam(m.t1, '');
+          addTeam(m.t2, '');
+        }
+
+        grid.appendChild(card);
+      });
+
+      panel.appendChild(grid);
+      container.appendChild(panel);
+    });
+
+    updateNav(allRounds);
   }
 
-  function makeRoundEl(title) {
-    const el = document.createElement('div');
-    el.className = 'round';
-    const t = document.createElement('div');
-    t.className = 'round-title';
-    t.textContent = title;
-    el.appendChild(t);
-    return el;
+  function cambiarRonda(dir) {
+    const panels = document.querySelectorAll('.round-panel');
+    panels[_currentRound].classList.remove('active');
+    _currentRound = Math.max(0, Math.min(_currentRound + dir, _totalRounds - 1));
+    panels[_currentRound].classList.add('active');
+    updateNav();
   }
 
-  function makeMatch(t1, tbd1, t2, tbd2) {
-    const el = document.createElement('div');
-    el.className = 'match';
+  function updateNav(allRounds) {
+    const names = allRounds
+      ? allRounds.map(r => r.name)
+      : Array.from(document.querySelectorAll('.round-panel')).map((_, i) => i);
 
-    const a = document.createElement('div');
-    a.className = 'team' + (tbd1 ? (t1 === 'BYE' ? ' bye' : ' tbd') : '');
-    a.textContent = t1;
+    document.getElementById('roundIndicator').textContent =
+      (allRounds ? allRounds[_currentRound].name : `Ronda ${_currentRound + 1}`)
+      + ` (${_currentRound + 1} / ${_totalRounds})`;
 
-    const b = document.createElement('div');
-    b.className = 'team' + (tbd2 ? (t2 === 'BYE' ? ' bye' : ' tbd') : '');
-    b.textContent = t2;
-
-    el.appendChild(a);
-    el.appendChild(b);
-    return el;
-  }
-
-  function makeConnector() {
-    const c = document.createElement('div');
-    c.className = 'connector';
-    c.innerHTML = `
-      <svg width="24" height="100%" style="position:absolute;top:0;left:0;width:24px;height:100%">
-        <line x1="0" y1="25%" x2="12" y2="25%" stroke="#1a5276" stroke-width="1"/>
-        <line x1="0" y1="75%" x2="12" y2="75%" stroke="#1a5276" stroke-width="1"/>
-        <line x1="12" y1="25%" x2="12" y2="75%" stroke="#1a5276" stroke-width="1"/>
-        <line x1="12" y1="50%" x2="24" y2="50%" stroke="#1a5276" stroke-width="1"/>
-      </svg>`;
-    return c;
+    document.getElementById('btnPrev').disabled = _currentRound === 0;
+    document.getElementById('btnNext').disabled = _currentRound === _totalRounds - 1;
   }
 
   function getRoundNames(rondas) {
     const names = [];
     for (let r = 1; r <= rondas; r++) {
-      if (r === 1)          names.push('Ronda 1');
-      else if (r === rondas) names.push('Final');
+      if (r === 1)               names.push('Ronda 1');
+      else if (r === rondas)     names.push('Final');
       else if (r === rondas - 1) names.push('Semifinal');
       else if (r === rondas - 2) names.push('Cuartos');
-      else names.push(`Ronda ${r}`);
+      else                       names.push(`Ronda ${r}`);
     }
     return names;
   }
