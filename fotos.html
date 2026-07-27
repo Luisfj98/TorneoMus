@@ -199,21 +199,13 @@
     .carousel-arrow.prev { left: 12px; }
     .carousel-arrow.next { right: 12px; }
 
-    .carousel-download {
-      all: unset;
-      cursor: pointer;
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 2;
-      color: #f4c430;
-      font-size: 1.1rem;
-      padding: 6px 10px;
-      background: rgba(0,0,0,0.45);
-      border-radius: 8px;
-      transition: background 0.15s;
+    .carousel-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
     }
-    .carousel-download:hover { background: rgba(244,196,48,0.25); }
 
     .carousel-dots {
       display: flex;
@@ -297,32 +289,35 @@
     .lightbox-close { top: 20px; right: 20px; }
     .lightbox-prev { left: 12px; top: 50%; transform: translateY(-50%); }
     .lightbox-next { right: 12px; top: 50%; transform: translateY(-50%); }
-    .lightbox-download {
-      all: unset;
-      cursor: pointer;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      color: #f4c430;
-      font-size: 1.6rem;
-      padding: 10px 16px;
-      background: rgba(0,0,0,0.5);
-      border-radius: 8px;
-    }
 
     .lightbox-close:hover,
     .lightbox-prev:hover,
-    .lightbox-next:hover,
-    .lightbox-download:hover { background: rgba(244,196,48,0.2); }
+    .lightbox-next:hover { background: rgba(244,196,48,0.2); }
 
     .lightbox-caption {
       position: fixed;
       bottom: 20px;
       left: 0; right: 0;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
       color: #ddd;
       font-size: 0.85rem;
     }
+
+    .lightbox-download {
+      all: unset;
+      cursor: pointer;
+      color: #f4c430;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(244,196,48,0.4);
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .lightbox-download:hover { background: rgba(244,196,48,0.2); }
   </style>
 </head>
 <body>
@@ -354,22 +349,27 @@
           <div class="carousel-track" id="carouselTrack"></div>
           <button class="carousel-arrow prev" onclick="moverCarrusel(-1)">&#8592;</button>
           <button class="carousel-arrow next" onclick="moverCarrusel(1)">&#8594;</button>
-          <a class="carousel-download" id="carouselDownload" href="#" download target="_blank" title="Descargar foto" onclick="event.stopPropagation()">&#8681; Descargar</a>
           <div class="carousel-caption" id="carouselCaption"></div>
         </div>
         <div class="carousel-dots" id="carouselDots"></div>
         <div class="carousel-thumbs" id="carouselThumbs"></div>
+        <div class="carousel-actions">
+          <a class="btn-refresh" id="carouselDownload" href="#" download target="_blank" title="Descargar esta foto">&#8681; Descargar esta foto</a>
+          <button class="btn-refresh" id="btnDescargarTodas" onclick="descargarTodas()">&#8681; Descargar todas</button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
-    <a class="lightbox-download" id="lightboxDownload" href="#" download target="_blank" title="Descargar foto">&#8681;</a>
     <button class="lightbox-prev" onclick="moverLightbox(-1)">&#8592;</button>
     <img id="lightboxImg" alt="" />
     <button class="lightbox-next" onclick="moverLightbox(1)">&#8594;</button>
-    <div class="lightbox-caption" id="lightboxCaption"></div>
+    <div class="lightbox-caption">
+      <span id="lightboxCaption"></span>
+      <a class="lightbox-download" id="lightboxDownload" href="#" download target="_blank" title="Descargar foto">&#8681; Descargar</a>
+    </div>
   </div>
 
 <script>
@@ -416,6 +416,33 @@
     return foto.id
       ? `https://drive.google.com/uc?export=download&id=${foto.id}`
       : foto.full;
+  }
+
+  function descargarTodas() {
+    if (fotos.length === 0) return;
+    const btn = document.getElementById('btnDescargarTodas');
+    btn.disabled = true;
+    btn.textContent = `Descargando 0 / ${fotos.length}...`;
+
+    fotos.forEach((foto, i) => {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = urlDescarga(foto);
+        a.download = foto.name;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        btn.textContent = `Descargando ${i + 1} / ${fotos.length}...`;
+        if (i === fotos.length - 1) {
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = '⇩ Descargar todas';
+          }, 600);
+        }
+      }, i * 600);
+    });
   }
 
   async function cargarFotos() {
