@@ -185,47 +185,22 @@
     .carousel-arrow {
       all: unset;
       cursor: pointer;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
       color: #f4c430;
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       padding: 8px 14px;
       background: rgba(0,0,0,0.45);
       border-radius: 8px;
       transition: background 0.15s;
     }
     .carousel-arrow:hover { background: rgba(244,196,48,0.25); }
-    .carousel-arrow.prev { left: 12px; }
-    .carousel-arrow.next { right: 12px; }
 
     .carousel-actions {
       display: flex;
+      align-items: center;
       justify-content: center;
       gap: 12px;
       flex-wrap: wrap;
       margin-top: 14px;
-    }
-
-    .carousel-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .carousel-dot {
-      all: unset;
-      cursor: pointer;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: rgba(245,230,224,0.3);
-      transition: background 0.15s, transform 0.15s;
-    }
-    .carousel-dot.active {
-      background: #f4c430;
-      transform: scale(1.2);
     }
 
     .carousel-thumbs {
@@ -347,17 +322,16 @@
       <div class="carousel" id="carousel" style="display:none">
         <div class="carousel-viewport">
           <div class="carousel-track" id="carouselTrack"></div>
-          <button class="carousel-arrow prev" onclick="moverCarrusel(-1)">&#8592;</button>
-          <button class="carousel-arrow next" onclick="moverCarrusel(1)">&#8594;</button>
           <div class="carousel-caption" id="carouselCaption"></div>
         </div>
-        <div class="carousel-dots" id="carouselDots"></div>
         <div class="carousel-actions">
+          <button class="carousel-arrow prev" onclick="moverCarrusel(-1)">&#8592;</button>
           <a class="btn-refresh" id="carouselDownload" href="#" download target="_blank" title="Descargar esta foto">&#8681; Descargar esta foto</a>
+          <button class="carousel-arrow next" onclick="moverCarrusel(1)">&#8594;</button>
         </div>
         <div class="carousel-thumbs" id="carouselThumbs"></div>
         <div class="carousel-actions">
-          <button class="btn-refresh" id="btnDescargarTodas" onclick="descargarTodas()">&#8681; Descargar todas</button>
+          <button class="btn-refresh" id="btnDescargarTodas" onclick="descargarTodas()">&#8681; Descargar todas (ZIP)</button>
         </div>
       </div>
     </div>
@@ -374,6 +348,7 @@
     </div>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   // ── Configuración ──────────────────────────────────────────────────────
   // 1. Crea una API key en https://console.cloud.google.com/apis/credentials
@@ -413,38 +388,70 @@
   }
 
   function urlDescarga(foto) {
-    // Fotos de Drive: enlace de descarga directa del archivo original.
+    // Fotos de Drive: contenido original vía la API (funciona tanto para
+    // navegar directamente como para el fetch() del ZIP, con CORS habilitado).
     // Fotos de ejemplo (sin id de Drive): se enlaza a la propia imagen.
     return foto.id
-      ? `https://drive.google.com/uc?export=download&id=${foto.id}`
+      ? `https://www.googleapis.com/drive/v3/files/${foto.id}?alt=media&key=${CONFIG.API_KEY}`
       : foto.full;
   }
 
-  function descargarTodas() {
+  function nombreUnico(nombre, i, usados) {
+    if (!usados.has(nombre)) { usados.add(nombre); return nombre; }
+    const punto = nombre.lastIndexOf('.');
+    const alternativo = punto === -1
+      ? `${nombre} (${i + 1})`
+      : `${nombre.slice(0, punto)} (${i + 1})${nombre.slice(punto)}`;
+    usados.add(alternativo);
+    return alternativo;
+  }
+
+  async function descargarTodas() {
     if (fotos.length === 0) return;
     const btn = document.getElementById('btnDescargarTodas');
+    const textoOriginal = btn.textContent;
     btn.disabled = true;
-    btn.textContent = `Descargando 0 / ${fotos.length}...`;
 
-    fotos.forEach((foto, i) => {
-      setTimeout(() => {
-        const a = document.createElement('a');
-        a.href = urlDescarga(foto);
-        a.download = foto.name;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+    const zip = new JSZip();
+    const usados = new Set();
+    const fallidas = [];
 
-        btn.textContent = `Descargando ${i + 1} / ${fotos.length}...`;
-        if (i === fotos.length - 1) {
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = '⇩ Descargar todas';
-          }, 600);
-        }
-      }, i * 600);
-    });
+    for (let i = 0; i < fotos.length; i++) {
+      const foto = fotos[i];
+      btn.textContent = `Descargando ${i + 1} / ${fotos.length}...`;
+      try {
+        const res = await fetch(urlDescarga(foto));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        zip.file(nombreUnico(foto.name, i, usados), await res.blob());
+      } catch (err) {
+        fallidas.push(foto.name);
+      }
+    }
+
+    if (Object.keys(zip.files).length === 0) {
+      alert('No se pudo descargar ninguna foto para el ZIP.');
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+      return;
+    }
+
+    btn.textContent = 'Generando ZIP...';
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = 'Fiestas Vegas del Condado 2026.zip';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+
+    if (fallidas.length > 0) {
+      alert(`No se pudieron incluir en el ZIP: ${fallidas.join(', ')}`);
+    }
   }
 
   async function cargarFotos() {
@@ -502,11 +509,9 @@
   // ── Carrusel ──────────────────────────────────────────────────────────
   function iniciarCarrusel() {
     const track  = document.getElementById('carouselTrack');
-    const dots   = document.getElementById('carouselDots');
     const thumbs = document.getElementById('carouselThumbs');
 
     track.innerHTML  = '';
-    dots.innerHTML   = '';
     thumbs.innerHTML = '';
 
     fotos.forEach((foto, i) => {
@@ -523,11 +528,6 @@
       img.alt = foto.name;
       slide.appendChild(img);
       track.appendChild(slide);
-
-      const dot = document.createElement('button');
-      dot.className = 'carousel-dot';
-      dot.onclick = () => irASlide(i);
-      dots.appendChild(dot);
 
       const thumb = document.createElement('div');
       thumb.className = 'carousel-thumb';
@@ -566,9 +566,6 @@
 
   function actualizarCarrusel() {
     document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
-
-    document.querySelectorAll('.carousel-dot').forEach((d, i) =>
-      d.classList.toggle('active', i === carouselIndex));
 
     document.querySelectorAll('.carousel-thumb').forEach((t, i) =>
       t.classList.toggle('active', i === carouselIndex));
