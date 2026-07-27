@@ -355,13 +355,18 @@
   const FOTOS_DEMO = [
     { name: 'Barra libre', seed: 'vegas-bar' },
     { name: 'Mesa de cartas', seed: 'vegas-cards' },
+    { name: 'Foto vertical (ejemplo)', seed: 'vegas-vertical', portrait: true },
     { name: 'Pista de baile', seed: 'vegas-dance' },
     { name: 'Photocall', seed: 'vegas-photo' },
     { name: 'Fuegos artificiales', seed: 'vegas-fireworks' },
   ].map(f => ({
     name: f.name,
-    thumb: `https://picsum.photos/seed/${f.seed}/300/200`,
-    full: `https://picsum.photos/seed/${f.seed}/1200/800`,
+    thumb: f.portrait
+      ? `https://picsum.photos/seed/${f.seed}/200/300`
+      : `https://picsum.photos/seed/${f.seed}/300/200`,
+    full: f.portrait
+      ? `https://picsum.photos/seed/${f.seed}/800/1200`
+      : `https://picsum.photos/seed/${f.seed}/1200/800`,
   }));
 
   let fotos = [];
