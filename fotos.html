@@ -139,6 +139,7 @@
       overflow: hidden;
       background: rgba(0,0,0,0.4);
       border: 1px solid rgba(200,70,95,0.3);
+      touch-action: pan-y;
     }
 
     .carousel-track {
@@ -247,6 +248,21 @@
       max-height: 88vh;
       border-radius: 10px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox.zoomed {
+      overflow: auto;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .lightbox.zoomed img {
+      max-width: none;
+      max-height: none;
+      width: auto;
+      height: auto;
+      cursor: zoom-out;
     }
 
     .lightbox-close,
@@ -340,7 +356,7 @@
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
     <button class="lightbox-prev" onclick="moverLightbox(-1)">&#8592;</button>
-    <img id="lightboxImg" alt="" />
+    <img id="lightboxImg" alt="" onclick="toggleZoom()" />
     <button class="lightbox-next" onclick="moverLightbox(1)">&#8594;</button>
     <div class="lightbox-caption">
       <span id="lightboxCaption"></span>
@@ -382,6 +398,7 @@
   let carouselIndex = 0;
   let carouselTimer = null;
   let lightboxIndex = 0;
+  let huboDeslizamiento = false;
 
   function conTamano(thumbnailLink, tam) {
     return thumbnailLink.replace(/=s\d+$/, `=s${tam}`);
@@ -517,7 +534,7 @@
     fotos.forEach((foto, i) => {
       const slide = document.createElement('div');
       slide.className = 'carousel-slide';
-      slide.onclick = () => abrirLightbox(i);
+      slide.onclick = () => { if (!huboDeslizamiento) abrirLightbox(i); };
       const bg = document.createElement('div');
       bg.className = 'carousel-slide-bg';
       bg.style.backgroundImage = `url("${foto.full}")`;
@@ -542,12 +559,38 @@
 
     carouselIndex = 0;
     actualizarCarrusel();
-    pararAutoplay();
-    carouselTimer = setInterval(() => moverCarrusel(1), 5000);
+    iniciarAutoplay();
 
     const viewport = document.querySelector('.carousel-viewport');
     viewport.onmouseenter = pararAutoplay;
-    viewport.onmouseleave = () => { carouselTimer = setInterval(() => moverCarrusel(1), 5000); };
+    viewport.onmouseleave = iniciarAutoplay;
+
+    let touchStartX = 0, touchStartY = 0, touchDeltaX = 0;
+    viewport.ontouchstart = e => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchDeltaX = 0;
+      huboDeslizamiento = false;
+      pararAutoplay();
+    };
+    viewport.ontouchmove = e => {
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy)) huboDeslizamiento = true;
+      touchDeltaX = dx;
+    };
+    viewport.ontouchend = () => {
+      if (huboDeslizamiento && Math.abs(touchDeltaX) > 40) {
+        moverCarrusel(touchDeltaX < 0 ? 1 : -1);
+      }
+      iniciarAutoplay();
+      setTimeout(() => { huboDeslizamiento = false; }, 300);
+    };
+  }
+
+  function iniciarAutoplay() {
+    pararAutoplay();
+    carouselTimer = setInterval(() => moverCarrusel(1), 5000);
   }
 
   function pararAutoplay() {
@@ -575,7 +618,7 @@
 
     const foto = fotos[carouselIndex];
     document.getElementById('carouselCaption').textContent =
-      `${foto.name} (${carouselIndex + 1} / ${fotos.length})`;
+      `${carouselIndex + 1} / ${fotos.length}`;
 
     const downloadBtn = document.getElementById('carouselDownload');
     downloadBtn.href = urlDescarga(foto);
@@ -593,11 +636,16 @@
     const foto = fotos[lightboxIndex];
     document.getElementById('lightboxImg').src = foto.full;
     document.getElementById('lightboxCaption').textContent =
-      `${foto.name} (${lightboxIndex + 1} / ${fotos.length})`;
+      `${lightboxIndex + 1} / ${fotos.length}`;
+    document.getElementById('lightbox').classList.remove('zoomed');
 
     const downloadBtn = document.getElementById('lightboxDownload');
     downloadBtn.href = urlDescarga(foto);
     downloadBtn.setAttribute('download', foto.name);
+  }
+
+  function toggleZoom() {
+    document.getElementById('lightbox').classList.toggle('zoomed');
   }
 
   function moverLightbox(dir) {
@@ -607,6 +655,7 @@
 
   function cerrarLightbox() {
     document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lightbox').classList.remove('zoomed');
   }
 
   document.addEventListener('keydown', e => {
