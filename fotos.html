@@ -408,8 +408,8 @@
   let carouselTimer = null;
   let lightboxIndex = 0;
 
-  function urlMiniatura(id, tam) {
-    return `https://drive.google.com/thumbnail?id=${id}&sz=w${tam}`;
+  function conTamano(thumbnailLink, tam) {
+    return thumbnailLink.replace(/=s\d+$/, `=s${tam}`);
   }
 
   function urlDescarga(foto) {
@@ -468,7 +468,7 @@
 
     const query = `'${CONFIG.FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}` +
-      `&fields=files(id,name)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
+      `&fields=files(id,name,thumbnailLink)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
 
     try {
       const res = await fetch(url);
@@ -486,8 +486,8 @@
       fotos = archivos.map(f => ({
         id: f.id,
         name: f.name,
-        thumb: urlMiniatura(f.id, 300),
-        full: urlMiniatura(f.id, 1600),
+        thumb: conTamano(f.thumbnailLink, 400),
+        full: conTamano(f.thumbnailLink, 1600),
       }));
 
       iniciarCarrusel();
