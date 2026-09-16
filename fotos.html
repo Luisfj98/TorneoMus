@@ -233,16 +233,38 @@
       border-color: #ffffff;
     }
 
-    /* ── Ajustes de escritorio: que quepa todo sin desplazarse ── */
+    /* ── Ajustes de escritorio: la foto ocupa todo el alto libre, sin scroll ── */
     @media (min-width: 900px) {
-      body { padding-top: 20px; padding-bottom: 20px; }
-      .header { margin-bottom: 16px; }
+      body {
+        height: 100vh;
+        max-height: 100vh;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .header { flex: 0 0 auto; margin-bottom: 16px; }
       .logo { max-width: 160px; margin-bottom: 6px; }
-      .card { margin-bottom: 12px; }
-      .toolbar { margin-bottom: 10px; }
-      .carousel-viewport { max-height: 48vh; }
-      .carousel-actions { margin-top: 10px; }
-      .carousel-thumbs { margin-top: 10px; }
+      .card {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0;
+      }
+      .toolbar { flex: 0 0 auto; margin-bottom: 10px; }
+      .demo-notice { flex: 0 0 auto; }
+      #galleryContainer { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+      .carousel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+      .carousel-viewport {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        aspect-ratio: unset;
+      }
+      .carousel-actions { flex: 0 0 auto; margin-top: 10px; }
+      .carousel-thumbs { flex: 0 0 auto; margin-top: 10px; }
     }
 
     /* ── Lightbox ── */
@@ -418,17 +440,15 @@
   let huboDeslizamiento = false;
   let thumbWindowStart = 0;
 
-  function conTamano(thumbnailLink, tam) {
-    return thumbnailLink.replace(/=s\d+$/, `=s${tam}`);
+  function urlOriginal(id) {
+    return `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${CONFIG.API_KEY}`;
   }
 
   function urlDescarga(foto) {
     // Fotos de Drive: contenido original vía la API (funciona tanto para
     // navegar directamente como para el fetch() del ZIP, con CORS habilitado).
     // Fotos de ejemplo (sin id de Drive): se enlaza a la propia imagen.
-    return foto.id
-      ? `https://www.googleapis.com/drive/v3/files/${foto.id}?alt=media&key=${CONFIG.API_KEY}`
-      : foto.full;
+    return foto.id ? urlOriginal(foto.id) : foto.full;
   }
 
   function nombreUnico(nombre, i, usados) {
@@ -525,7 +545,7 @@
 
     const query = `'${CONFIG.FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}` +
-      `&fields=files(id,name,thumbnailLink)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
+      `&fields=files(id,name)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
 
     try {
       const res = await fetch(url);
@@ -543,8 +563,8 @@
       fotos = archivos.map(f => ({
         id: f.id,
         name: f.name,
-        thumb: conTamano(f.thumbnailLink, 400),
-        full: conTamano(f.thumbnailLink, 1600),
+        thumb: urlOriginal(f.id),
+        full: urlOriginal(f.id),
       }));
 
       iniciarCarrusel();
