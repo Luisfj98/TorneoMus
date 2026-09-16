@@ -19,9 +19,9 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #f2f2f2;
       min-height: 100vh;
-      padding: 32px 16px;
-      padding-top: max(32px, env(safe-area-inset-top));
-      padding-bottom: max(32px, env(safe-area-inset-bottom));
+      padding: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
       padding-left: max(16px, env(safe-area-inset-left));
       padding-right: max(16px, env(safe-area-inset-right));
       position: relative;
@@ -31,14 +31,14 @@
     /* ── Header ── */
     .header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 14px;
     }
 
     .logo {
-      max-width: 220px;
-      width: 60%;
+      max-width: 150px;
+      width: 40%;
       height: auto;
-      margin-bottom: 14px;
+      margin-bottom: 6px;
     }
 
     h1 {
@@ -60,7 +60,7 @@
     }
 
     .card {
-      margin: 0 auto 20px;
+      margin: 0 auto;
       max-width: 1500px;
     }
 
@@ -70,7 +70,7 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 18px;
+      margin-bottom: 8px;
     }
 
     .toolbar h2 {
@@ -134,6 +134,9 @@
       margin: 0 auto;
     }
 
+    /* El alto de .carousel-viewport lo calcula ajustarLayout() por JS,
+       en cualquier tamaño de pantalla, para que quepa todo sin
+       desplazar la página. */
     .carousel-viewport {
       position: relative;
       border-radius: 12px;
@@ -141,13 +144,6 @@
       background: rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.25);
       touch-action: pan-y;
-    }
-
-    /* En móvil no hay JS fijando el alto, así que necesita una
-       proporción para tener tamaño; en escritorio (ver media query
-       más abajo) el alto lo calcula ajustarLayoutEscritorio(). */
-    @media (max-width: 899px) {
-      .carousel-viewport { aspect-ratio: 4 / 3; }
     }
 
     .carousel-track {
@@ -210,14 +206,14 @@
       justify-content: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-top: 8px;
     }
 
     .carousel-thumbs {
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 8px;
       overflow-x: auto;
       padding-bottom: 4px;
     }
@@ -238,20 +234,6 @@
     .carousel-thumb.active {
       opacity: 1;
       border-color: #ffffff;
-    }
-
-    /* ── Ajustes de escritorio: la foto ocupa el alto libre, sin scroll ──
-       El alto exacto de .carousel-viewport se calcula por JS
-       (ajustarLayoutEscritorio) según el espacio realmente disponible;
-       aquí solo recortamos márgenes para dejarle más sitio. */
-    @media (min-width: 900px) {
-      body { padding-top: 16px; padding-bottom: 16px; }
-      .header { margin-bottom: 14px; }
-      .logo { max-width: 150px; margin-bottom: 6px; }
-      .card { margin-bottom: 0; }
-      .toolbar { margin-bottom: 8px; }
-      .carousel-actions { margin-top: 8px; }
-      .carousel-thumbs { margin-top: 8px; }
     }
 
     /* ── Lightbox ── */
@@ -540,7 +522,7 @@
       iniciarCarrusel();
       stateMsg.style.display = 'none';
       carousel.style.display = 'block';
-      ajustarLayoutEscritorio();
+      ajustarLayout();
       return;
     }
 
@@ -571,27 +553,22 @@
       iniciarCarrusel();
       stateMsg.style.display = 'none';
       carousel.style.display = 'block';
-      ajustarLayoutEscritorio();
+      ajustarLayout();
     } catch (err) {
       stateMsg.classList.add('error');
       stateMsg.textContent = 'No se pudieron cargar las fotos: ' + err.message;
     }
   }
 
-  // ── Ajusta el alto del carrusel al espacio libre real en escritorio,
-  //    para que quepa todo (flechas, miniaturas, descargas) sin scroll.
-  function ajustarLayoutEscritorio() {
+  // ── Ajusta el alto del carrusel al espacio libre real (en cualquier
+  //    tamaño de pantalla), para que quepa todo (flechas, miniaturas,
+  //    descargas) sin tener que desplazar la página.
+  function ajustarLayout() {
     const viewport = document.querySelector('.carousel-viewport');
     const carousel = document.querySelector('.carousel');
     if (!viewport || !carousel) return;
 
-    if (window.innerWidth < 900) {
-      viewport.style.height = '';
-      document.body.style.overflow = '';
-      return;
-    }
-
-    // Altura "natural" (por aspect-ratio) para medir bien a los hermanos.
+    // Alto "natural" (vacío) para medir bien a los hermanos.
     viewport.style.height = '';
 
     const otros = Array.from(carousel.children).filter(el => el !== viewport);
@@ -604,11 +581,11 @@
     const margenInferior = parseFloat(getComputedStyle(document.body).paddingBottom) || 16;
     const disponible = window.innerHeight - topCarousel - alturaOtros - margenInferior;
 
-    viewport.style.height = Math.max(220, disponible) + 'px';
+    viewport.style.height = Math.max(180, disponible) + 'px';
     document.body.style.overflow = 'hidden';
   }
 
-  window.addEventListener('resize', ajustarLayoutEscritorio);
+  window.addEventListener('resize', ajustarLayout);
 
   // ── Carrusel ──────────────────────────────────────────────────────────
   function iniciarCarrusel() {
