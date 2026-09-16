@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#3d0d18" />
+  <meta name="theme-color" content="#000000" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Fiestas Vegas 2026</title>
@@ -12,12 +12,12 @@
 
     html {
       min-height: 100%;
-      background-color: #240509;
+      background-color: #000000;
     }
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #f5e6e0;
+      color: #f2f2f2;
       min-height: 100vh;
       padding: 32px 16px;
       padding-top: max(32px, env(safe-area-inset-top));
@@ -25,7 +25,7 @@
       padding-left: max(16px, env(safe-area-inset-left));
       padding-right: max(16px, env(safe-area-inset-right));
       position: relative;
-      background: radial-gradient(circle at 50% 0%, #5c1424 0%, #1a0509 70%);
+      background: radial-gradient(circle at 50% 0%, #2b2b2b 0%, #050505 70%);
     }
 
     /* ── Header ── */
@@ -34,17 +34,24 @@
       margin-bottom: 32px;
     }
 
+    .logo {
+      max-width: 220px;
+      width: 60%;
+      height: auto;
+      margin-bottom: 14px;
+    }
+
     h1 {
       font-size: 2.4rem;
-      color: #f4c430;
+      color: #ffffff;
       letter-spacing: 3px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(244,196,48,0.3);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(255,255,255,0.25);
       font-weight: 800;
       margin-bottom: 6px;
     }
 
     .subtitle {
-      color: #d9a3ae;
+      color: #b0b0b0;
       font-size: 0.9rem;
     }
 
@@ -67,7 +74,7 @@
     }
 
     .toolbar h2 {
-      color: #f4c430;
+      color: #ffffff;
       font-size: 1.05rem;
       text-shadow: 0 1px 4px rgba(0,0,0,0.5);
     }
@@ -76,22 +83,22 @@
       all: unset;
       cursor: pointer;
       background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(200,70,95,0.4);
+      border: 1px solid rgba(255,255,255,0.35);
       border-radius: 8px;
-      color: #f4c430;
+      color: #ffffff;
       font-size: 0.85rem;
       padding: 8px 16px;
       transition: background 0.15s;
     }
-    .btn-refresh:hover { background: rgba(244,196,48,0.15); }
+    .btn-refresh:hover { background: rgba(255,255,255,0.15); }
 
     /* ── Aviso demo ── */
     .demo-notice {
-      background: rgba(90,20,35,0.6);
-      border: 1px solid rgba(244,196,48,0.4);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.4);
       border-radius: 8px;
       padding: 10px 14px;
-      color: #f4c430;
+      color: #ffffff;
       font-size: 0.82rem;
       margin-bottom: 16px;
       text-align: center;
@@ -101,20 +108,21 @@
     .state-msg {
       text-align: center;
       padding: 40px 16px;
-      color: #d9a3ae;
+      color: #b0b0b0;
       font-size: 0.95rem;
     }
 
     .state-msg.error {
-      color: #ff9e9e;
+      color: #ffffff;
+      font-weight: 700;
     }
 
     .spinner {
       width: 28px;
       height: 28px;
       margin: 0 auto 14px;
-      border: 3px solid rgba(244,196,48,0.25);
-      border-top-color: #f4c430;
+      border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: #ffffff;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -132,7 +140,7 @@
       border-radius: 12px;
       overflow: hidden;
       background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(200,70,95,0.3);
+      border: 1px solid rgba(255,255,255,0.25);
       touch-action: pan-y;
     }
 
@@ -173,21 +181,21 @@
       left: 0; right: 0; bottom: 0;
       padding: 14px 18px;
       font-size: 0.85rem;
-      color: #f5e6e0;
+      color: #f2f2f2;
       background: linear-gradient(transparent, rgba(0,0,0,0.8));
     }
 
     .carousel-arrow {
       all: unset;
       cursor: pointer;
-      color: #f4c430;
+      color: #ffffff;
       font-size: 1.3rem;
       padding: 8px 14px;
       background: rgba(0,0,0,0.45);
       border-radius: 8px;
       transition: background 0.15s;
     }
-    .carousel-arrow:hover { background: rgba(244,196,48,0.25); }
+    .carousel-arrow:hover { background: rgba(255,255,255,0.2); }
 
     .carousel-actions {
       display: flex;
@@ -221,7 +229,7 @@
     .carousel-thumb:hover { opacity: 0.9; }
     .carousel-thumb.active {
       opacity: 1;
-      border-color: #f4c430;
+      border-color: #ffffff;
     }
 
     /* ── Lightbox ── */
@@ -265,7 +273,7 @@
       all: unset;
       cursor: pointer;
       position: fixed;
-      color: #f4c430;
+      color: #ffffff;
       font-size: 1.8rem;
       padding: 10px 16px;
       background: rgba(0,0,0,0.5);
@@ -277,7 +285,7 @@
 
     .lightbox-close:hover,
     .lightbox-prev:hover,
-    .lightbox-next:hover { background: rgba(244,196,48,0.2); }
+    .lightbox-next:hover { background: rgba(255,255,255,0.2); }
 
     .lightbox-caption {
       position: fixed;
@@ -294,20 +302,21 @@
     .lightbox-download {
       all: unset;
       cursor: pointer;
-      color: #f4c430;
+      color: #ffffff;
       font-size: 0.8rem;
       padding: 6px 12px;
       background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(244,196,48,0.4);
+      border: 1px solid rgba(255,255,255,0.4);
       border-radius: 8px;
       transition: background 0.15s;
     }
-    .lightbox-download:hover { background: rgba(244,196,48,0.2); }
+    .lightbox-download:hover { background: rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
 
   <div class="header">
+    <img class="logo" src="logo.png" alt="Nerva" />
     <h1>Fiestas Vegas 2026</h1>
     <p class="subtitle">Galería de fotos</p>
   </div>
