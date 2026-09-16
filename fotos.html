@@ -209,6 +209,7 @@
 
     .carousel-thumbs {
       display: flex;
+      justify-content: center;
       gap: 8px;
       margin-top: 14px;
       overflow-x: auto;
@@ -549,7 +550,7 @@
         id: f.id,
         name: f.name,
         thumb: conTamano(f.thumbnailLink, 300),
-        full: urlOriginal(f.id),
+        full: conTamano(f.thumbnailLink, 1600),
       }));
 
       iniciarCarrusel();
