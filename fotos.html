@@ -375,7 +375,7 @@
   //    y copia su ID (el trozo de la URL tras /folders/).
   const CONFIG = {
     API_KEY: 'AIzaSyAU8d1zLONrS_UwWTLVv94-oEtCq3fic_M',
-    FOLDER_ID: '1W3JZz7XzX2UcJgCDByM4QJYgM5PT2xcD',
+    FOLDER_ID: '1jarXe49FaY8ZwVg_CTopcQ_HChBJ49wW',
   };
 
   // Fotos de ejemplo que se muestran mientras CONFIG no esté rellenado.
@@ -396,11 +396,14 @@
       : `https://picsum.photos/seed/${f.seed}/1200/800`,
   }));
 
+  const THUMBS_POR_PAGINA = 10;
+
   let fotos = [];
   let carouselIndex = 0;
   let carouselTimer = null;
   let lightboxIndex = 0;
   let huboDeslizamiento = false;
+  let thumbWindowStart = 0;
 
   function conTamano(thumbnailLink, tam) {
     return thumbnailLink.replace(/=s\d+$/, `=s${tam}`);
@@ -527,11 +530,8 @@
 
   // ── Carrusel ──────────────────────────────────────────────────────────
   function iniciarCarrusel() {
-    const track  = document.getElementById('carouselTrack');
-    const thumbs = document.getElementById('carouselThumbs');
-
-    track.innerHTML  = '';
-    thumbs.innerHTML = '';
+    const track = document.getElementById('carouselTrack');
+    track.innerHTML = '';
 
     fotos.forEach((foto, i) => {
       const slide = document.createElement('div');
@@ -547,19 +547,11 @@
       img.alt = foto.name;
       slide.appendChild(img);
       track.appendChild(slide);
-
-      const thumb = document.createElement('div');
-      thumb.className = 'carousel-thumb';
-      thumb.onclick = () => irASlide(i);
-      const thumbImg = document.createElement('img');
-      thumbImg.src = foto.thumb;
-      thumbImg.loading = 'lazy';
-      thumbImg.alt = foto.name;
-      thumb.appendChild(thumbImg);
-      thumbs.appendChild(thumb);
     });
 
     carouselIndex = 0;
+    thumbWindowStart = 0;
+    renderThumbs();
     actualizarCarrusel();
     iniciarAutoplay();
 
@@ -609,13 +601,38 @@
     actualizarCarrusel();
   }
 
+  function renderThumbs() {
+    const thumbs = document.getElementById('carouselThumbs');
+    thumbs.innerHTML = '';
+
+    const fin = Math.min(thumbWindowStart + THUMBS_POR_PAGINA, fotos.length);
+    for (let i = thumbWindowStart; i < fin; i++) {
+      const foto = fotos[i];
+      const thumb = document.createElement('div');
+      thumb.className = 'carousel-thumb';
+      thumb.onclick = () => irASlide(i);
+      const thumbImg = document.createElement('img');
+      thumbImg.src = foto.thumb;
+      thumbImg.loading = 'lazy';
+      thumbImg.alt = foto.name;
+      thumb.appendChild(thumbImg);
+      thumbs.appendChild(thumb);
+    }
+  }
+
   function actualizarCarrusel() {
     document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
 
-    document.querySelectorAll('.carousel-thumb').forEach((t, i) =>
-      t.classList.toggle('active', i === carouselIndex));
+    const paginaActual = Math.floor(carouselIndex / THUMBS_POR_PAGINA) * THUMBS_POR_PAGINA;
+    if (paginaActual !== thumbWindowStart) {
+      thumbWindowStart = paginaActual;
+      renderThumbs();
+    }
 
-    const activeThumb = document.querySelectorAll('.carousel-thumb')[carouselIndex];
+    document.querySelectorAll('.carousel-thumb').forEach((t, i) =>
+      t.classList.toggle('active', thumbWindowStart + i === carouselIndex));
+
+    const activeThumb = document.querySelectorAll('.carousel-thumb')[carouselIndex - thumbWindowStart];
     if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
     const foto = fotos[carouselIndex];
