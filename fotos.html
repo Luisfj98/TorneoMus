@@ -424,6 +424,10 @@
     return `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${CONFIG.API_KEY}`;
   }
 
+  function conTamano(thumbnailLink, tam) {
+    return thumbnailLink.replace(/=s\d+$/, `=s${tam}`);
+  }
+
   function urlDescarga(foto) {
     // Fotos de Drive: contenido original vía la API (funciona tanto para
     // navegar directamente como para el fetch() del ZIP, con CORS habilitado).
@@ -526,7 +530,7 @@
 
     const query = `'${CONFIG.FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}` +
-      `&fields=files(id,name)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
+      `&fields=files(id,name,thumbnailLink)&orderBy=name&pageSize=1000&key=${CONFIG.API_KEY}`;
 
     try {
       const res = await fetch(url);
@@ -544,7 +548,7 @@
       fotos = archivos.map(f => ({
         id: f.id,
         name: f.name,
-        thumb: urlOriginal(f.id),
+        thumb: conTamano(f.thumbnailLink, 300),
         full: urlOriginal(f.id),
       }));
 
@@ -601,14 +605,12 @@
       slide.onclick = () => { if (!huboDeslizamiento) abrirLightbox(i); };
       const bg = document.createElement('img');
       bg.className = 'carousel-slide-bg';
-      bg.src = foto.full;
-      bg.loading = i === 0 ? 'eager' : 'lazy';
+      bg.dataset.src = foto.full;
       bg.alt = '';
       slide.appendChild(bg);
       const img = document.createElement('img');
       img.className = 'carousel-slide-photo';
-      img.src = foto.full;
-      img.loading = i === 0 ? 'eager' : 'lazy';
+      img.dataset.src = foto.full;
       img.alt = foto.name;
       slide.appendChild(img);
       track.appendChild(slide);
@@ -685,8 +687,29 @@
     }
   }
 
+  // Solo carga en el DOM la foto grande actual y sus vecinas inmediatas,
+  // sin depender de loading="lazy" (cuyo margen de precarga varía según
+  // el tamaño de pantalla y con 500+ fotos puede disparar muchas
+  // descargas pesadas a la vez en monitores grandes).
+  function cargarSlidesCercanos() {
+    const MARGEN = 1;
+    const desde = Math.max(0, carouselIndex - MARGEN);
+    const hasta = Math.min(fotos.length - 1, carouselIndex + MARGEN);
+    const slides = document.querySelectorAll('.carousel-slide');
+
+    for (let i = desde; i <= hasta; i++) {
+      const slide = slides[i];
+      if (!slide) continue;
+      slide.querySelectorAll('img[data-src]').forEach(img => {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+      });
+    }
+  }
+
   function actualizarCarrusel() {
     document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
+    cargarSlidesCercanos();
 
     const paginaActual = Math.floor(carouselIndex / THUMBS_POR_PAGINA) * THUMBS_POR_PAGINA;
     if (paginaActual !== thumbWindowStart) {
