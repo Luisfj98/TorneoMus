@@ -437,10 +437,10 @@
     const zip = new JSZip();
     const usados = new Set();
     const fallidas = [];
+    let completadas = 0;
 
-    for (let i = 0; i < fotos.length; i++) {
+    async function descargarUna(i) {
       const foto = fotos[i];
-      btn.textContent = `Descargando ${i + 1} / ${fotos.length}...`;
       try {
         const res = await fetch(urlDescarga(foto));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -448,7 +448,20 @@
       } catch (err) {
         fallidas.push(foto.name);
       }
+      completadas++;
+      btn.textContent = `Descargando ${completadas} / ${fotos.length}...`;
     }
+
+    // Descarga varias fotos en paralelo (en vez de una a una) para
+    // aprovechar mejor el ancho de banda con carpetas grandes.
+    const CONCURRENCIA = 6;
+    const cola = fotos.map((_, i) => i);
+    async function trabajador() {
+      while (cola.length > 0) {
+        await descargarUna(cola.shift());
+      }
+    }
+    await Promise.all(Array.from({ length: CONCURRENCIA }, trabajador));
 
     if (Object.keys(zip.files).length === 0) {
       alert('No se pudo descargar ninguna foto para el ZIP.');
@@ -458,7 +471,9 @@
     }
 
     btn.textContent = 'Generando ZIP...';
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    // Las fotos (JPG) ya vienen comprimidas: STORE evita perder tiempo
+    // re-comprimiéndolas sin ganar espacio.
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
 
     const a = document.createElement('a');
     a.href = URL.createObjectURL(zipBlob);
