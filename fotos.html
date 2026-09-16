@@ -136,12 +136,18 @@
 
     .carousel-viewport {
       position: relative;
-      aspect-ratio: 4 / 3;
       border-radius: 12px;
       overflow: hidden;
       background: rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.25);
       touch-action: pan-y;
+    }
+
+    /* En móvil no hay JS fijando el alto, así que necesita una
+       proporción para tener tamaño; en escritorio (ver media query
+       más abajo) el alto lo calcula ajustarLayoutEscritorio(). */
+    @media (max-width: 899px) {
+      .carousel-viewport { aspect-ratio: 4 / 3; }
     }
 
     .carousel-track {
