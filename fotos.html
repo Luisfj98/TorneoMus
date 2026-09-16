@@ -441,6 +441,26 @@
   let huboDeslizamiento = false;
   let thumbWindowStart = 0;
 
+  // ── Recordar la foto actual entre recargas (localStorage) ──────────────
+  function claveGuardado() {
+    return `nerva_foto_actual_${CONFIG.FOLDER_ID}`;
+  }
+
+  function guardarIndiceActual() {
+    try {
+      localStorage.setItem(claveGuardado(), String(carouselIndex));
+    } catch (err) { /* localStorage no disponible: sin memoria entre recargas */ }
+  }
+
+  function leerIndiceGuardado() {
+    try {
+      const valor = parseInt(localStorage.getItem(claveGuardado()), 10);
+      return Number.isFinite(valor) ? valor : 0;
+    } catch (err) {
+      return 0;
+    }
+  }
+
   function urlOriginal(id) {
     return `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${CONFIG.API_KEY}`;
   }
@@ -632,7 +652,8 @@
       track.appendChild(slide);
     });
 
-    carouselIndex = 0;
+    const guardado = leerIndiceGuardado();
+    carouselIndex = (guardado >= 0 && guardado < fotos.length) ? guardado : 0;
     thumbWindowStart = 0;
     renderThumbs();
     actualizarCarrusel();
@@ -722,6 +743,7 @@
   function actualizarCarrusel() {
     document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
     cargarSlidesCercanos();
+    guardarIndiceActual();
 
     const paginaActual = Math.floor(carouselIndex / THUMBS_POR_PAGINA) * THUMBS_POR_PAGINA;
     if (paginaActual !== thumbWindowStart) {
