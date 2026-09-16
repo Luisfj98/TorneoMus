@@ -233,38 +233,18 @@
       border-color: #ffffff;
     }
 
-    /* ── Ajustes de escritorio: la foto ocupa todo el alto libre, sin scroll ── */
+    /* ── Ajustes de escritorio: la foto ocupa el alto libre, sin scroll ──
+       El alto exacto de .carousel-viewport se calcula por JS
+       (ajustarLayoutEscritorio) según el espacio realmente disponible;
+       aquí solo recortamos márgenes para dejarle más sitio. */
     @media (min-width: 900px) {
-      body {
-        height: 100vh;
-        max-height: 100vh;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-      .header { flex: 0 0 auto; margin-bottom: 16px; }
-      .logo { max-width: 160px; margin-bottom: 6px; }
-      .card {
-        flex: 1 1 auto;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0;
-      }
-      .toolbar { flex: 0 0 auto; margin-bottom: 10px; }
-      .demo-notice { flex: 0 0 auto; }
-      #galleryContainer { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-      .carousel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-      .carousel-viewport {
-        flex: 1 1 auto;
-        min-height: 0;
-        max-height: none;
-        aspect-ratio: unset;
-      }
-      .carousel-actions { flex: 0 0 auto; margin-top: 10px; }
-      .carousel-thumbs { flex: 0 0 auto; margin-top: 10px; }
+      body { padding-top: 16px; padding-bottom: 16px; }
+      .header { margin-bottom: 14px; }
+      .logo { max-width: 150px; margin-bottom: 6px; }
+      .card { margin-bottom: 0; }
+      .toolbar { margin-bottom: 8px; }
+      .carousel-actions { margin-top: 8px; }
+      .carousel-thumbs { margin-top: 8px; }
     }
 
     /* ── Lightbox ── */
@@ -540,6 +520,7 @@
       iniciarCarrusel();
       stateMsg.style.display = 'none';
       carousel.style.display = 'block';
+      ajustarLayoutEscritorio();
       return;
     }
 
@@ -570,11 +551,44 @@
       iniciarCarrusel();
       stateMsg.style.display = 'none';
       carousel.style.display = 'block';
+      ajustarLayoutEscritorio();
     } catch (err) {
       stateMsg.classList.add('error');
       stateMsg.textContent = 'No se pudieron cargar las fotos: ' + err.message;
     }
   }
+
+  // ── Ajusta el alto del carrusel al espacio libre real en escritorio,
+  //    para que quepa todo (flechas, miniaturas, descargas) sin scroll.
+  function ajustarLayoutEscritorio() {
+    const viewport = document.querySelector('.carousel-viewport');
+    const carousel = document.querySelector('.carousel');
+    if (!viewport || !carousel) return;
+
+    if (window.innerWidth < 900) {
+      viewport.style.height = '';
+      document.body.style.overflow = '';
+      return;
+    }
+
+    // Altura "natural" (por aspect-ratio) para medir bien a los hermanos.
+    viewport.style.height = '';
+
+    const otros = Array.from(carousel.children).filter(el => el !== viewport);
+    const alturaOtros = otros.reduce((suma, el) => {
+      const estilo = getComputedStyle(el);
+      return suma + el.offsetHeight + parseFloat(estilo.marginTop) + parseFloat(estilo.marginBottom);
+    }, 0);
+
+    const topCarousel = carousel.getBoundingClientRect().top;
+    const margenInferior = parseFloat(getComputedStyle(document.body).paddingBottom) || 16;
+    const disponible = window.innerHeight - topCarousel - alturaOtros - margenInferior;
+
+    viewport.style.height = Math.max(220, disponible) + 'px';
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.addEventListener('resize', ajustarLayoutEscritorio);
 
   // ── Carrusel ──────────────────────────────────────────────────────────
   function iniciarCarrusel() {
