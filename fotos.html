@@ -136,12 +136,18 @@
 
     .carousel-viewport {
       position: relative;
-      aspect-ratio: 4 / 3;
       border-radius: 12px;
       overflow: hidden;
       background: rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.25);
       touch-action: pan-y;
+    }
+
+    /* En móvil no hay JS fijando el alto, así que necesita una
+       proporción para tener tamaño; en escritorio (ver media query
+       más abajo) el alto lo calcula ajustarLayoutEscritorio(). */
+    @media (max-width: 899px) {
+      .carousel-viewport { aspect-ratio: 4 / 3; }
     }
 
     .carousel-track {
@@ -255,15 +261,17 @@
       inset: 0;
       background: rgba(0,0,0,0.9);
       z-index: 100;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 14px;
       padding: 24px;
     }
     .lightbox.open { display: flex; }
 
     .lightbox img {
       max-width: 100%;
-      max-height: 88vh;
+      max-height: 78vh;
       border-radius: 10px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.7);
       cursor: zoom-in;
@@ -283,34 +291,41 @@
       cursor: zoom-out;
     }
 
-    .lightbox-close,
-    .lightbox-prev,
-    .lightbox-next {
+    .lightbox-close {
       all: unset;
       cursor: pointer;
       position: fixed;
+      top: 20px;
+      right: 20px;
       color: #ffffff;
       font-size: 1.8rem;
       padding: 10px 16px;
       background: rgba(0,0,0,0.5);
       border-radius: 8px;
     }
-    .lightbox-close { top: 20px; right: 20px; }
-    .lightbox-prev { left: 12px; top: 50%; transform: translateY(-50%); }
-    .lightbox-next { right: 12px; top: 50%; transform: translateY(-50%); }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
-    .lightbox-close:hover,
-    .lightbox-prev:hover,
-    .lightbox-next:hover { background: rgba(255,255,255,0.2); }
-
-    .lightbox-caption {
-      position: fixed;
-      bottom: 20px;
-      left: 0; right: 0;
+    .lightbox-actions {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
       gap: 14px;
+    }
+
+    .lightbox-nav {
+      all: unset;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 1.4rem;
+      padding: 8px 14px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
+
+    .lightbox-caption {
       color: #ddd;
       font-size: 0.85rem;
     }
@@ -373,12 +388,12 @@
 
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
-    <button class="lightbox-prev" onclick="moverLightbox(-1)">&#8592;</button>
     <img id="lightboxImg" alt="" onclick="toggleZoom()" />
-    <button class="lightbox-next" onclick="moverLightbox(1)">&#8594;</button>
-    <div class="lightbox-caption">
-      <span id="lightboxCaption"></span>
+    <div class="lightbox-actions">
+      <button class="lightbox-nav" onclick="moverLightbox(-1)">&#8592;</button>
+      <span class="lightbox-caption" id="lightboxCaption"></span>
       <a class="lightbox-download" id="lightboxDownload" href="#" download target="_blank" title="Descargar foto">&#8681; Descargar</a>
+      <button class="lightbox-nav" onclick="moverLightbox(1)">&#8594;</button>
     </div>
   </div>
 
