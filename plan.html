@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffe4ec" />
+  <title>Tengo un plan</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(160deg, #ffe4ec 0%, #ffd1dc 50%, #ffc2d1 100%);
+      color: #5a1a2e;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .pantalla {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .pantalla.activa { display: flex; animation: aparecer .5s ease; }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .emoji { font-size: 64px; margin-bottom: 12px; }
+
+    h1 {
+      font-size: clamp(26px, 6vw, 44px);
+      margin-bottom: 32px;
+      line-height: 1.2;
+    }
+
+    .botones {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(90, 26, 46, .2);
+    }
+
+    #btn-si {
+      background: #e63967;
+      color: #fff;
+      font-size: 22px;
+      padding: 14px 36px;
+      transition: transform .25s ease;
+      position: relative;
+      z-index: 2;
+    }
+    #btn-si:hover { background: #d42a58; }
+
+    #btn-no {
+      background: #fff;
+      color: #5a1a2e;
+      font-size: 22px;
+      padding: 14px 36px;
+      transition: left .2s ease, top .2s ease;
+      z-index: 10;
+      touch-action: none;
+    }
+
+    /* Pantalla de planes */
+    .planes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 20px;
+    }
+
+    .plan {
+      background: #fff;
+      color: #5a1a2e;
+      border: 3px solid transparent;
+      border-radius: 18px;
+      padding: 16px 10px;
+      font-size: 17px;
+      box-shadow: 0 4px 12px rgba(90, 26, 46, .12);
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .plan .icono { display: block; font-size: 34px; margin-bottom: 6px; }
+    .plan:hover { transform: translateY(-2px); }
+    .plan.elegido { border-color: #e63967; background: #fff0f4; }
+
+    #otro-wrap {
+      width: 100%;
+      max-width: 560px;
+      display: none;
+      margin-bottom: 20px;
+    }
+    #otro-wrap.visible { display: block; }
+
+    #otro-texto {
+      width: 100%;
+      font-family: inherit;
+      font-size: 17px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 2px solid #e63967;
+      outline: none;
+      resize: none;
+      color: #5a1a2e;
+    }
+
+    #btn-confirmar {
+      background: #e63967;
+      color: #fff;
+      font-size: 20px;
+      padding: 14px 40px;
+    }
+    #btn-confirmar:disabled { opacity: .4; cursor: not-allowed; }
+
+    .resumen {
+      font-size: clamp(20px, 5vw, 28px);
+      margin-bottom: 28px;
+      max-width: 560px;
+    }
+    .resumen strong { color: #e63967; }
+
+    #btn-whatsapp {
+      background: #25d366;
+      color: #fff;
+      font-size: 18px;
+      padding: 14px 30px;
+      text-decoration: none;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(90, 26, 46, .2);
+      display: inline-block;
+    }
+
+    .volver {
+      margin-top: 18px;
+      background: none;
+      box-shadow: none;
+      color: #5a1a2e;
+      text-decoration: underline;
+      font-weight: 400;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pantalla 1: la pregunta -->
+  <section class="pantalla activa" id="p-pregunta">
+    <div class="emoji">💌</div>
+    <h1>¿Quieres hacer un plan conmigo?</h1>
+    <div class="botones" id="botones">
+      <button id="btn-si">SÍ</button>
+      <button id="btn-no">NO</button>
+    </div>
+  </section>
+
+  <!-- Pantalla 2: elegir plan -->
+  <section class="pantalla" id="p-planes">
+    <div class="emoji">🥳</div>
+    <h1>¡Sabía que dirías que sí!<br>¿Qué plan te apetece?</h1>
+
+    <div class="planes" id="planes">
+      <button class="plan" data-plan="Ir a cenar"><span class="icono">🍝</span>Ir a cenar</button>
+      <button class="plan" data-plan="Ir al cine"><span class="icono">🎬</span>Ir al cine</button>
+      <button class="plan" data-plan="Tomar algo"><span class="icono">🍹</span>Tomar algo</button>
+      <button class="plan" data-plan="Dar un paseo"><span class="icono">🌳</span>Dar un paseo</button>
+      <button class="plan" data-plan="Peli y manta en casa"><span class="icono">🛋️</span>Peli y manta</button>
+      <button class="plan" data-plan="OTRO"><span class="icono">✍️</span>OTRO</button>
+    </div>
+
+    <div id="otro-wrap">
+      <textarea id="otro-texto" rows="2" maxlength="200" placeholder="Escribe aquí tu plan..."></textarea>
+    </div>
+
+    <button id="btn-confirmar" disabled>¡Este!</button>
+  </section>
+
+  <!-- Pantalla 3: confirmación -->
+  <section class="pantalla" id="p-fin">
+    <div class="emoji">🥰</div>
+    <h1>¡Plan cerrado!</h1>
+    <p class="resumen">Has elegido: <strong id="plan-final"></strong></p>
+    <a id="btn-whatsapp" href="#" target="_blank" rel="noopener">Enviármelo por WhatsApp</a>
+    <button class="volver" id="btn-volver">Cambiar de plan</button>
+  </section>
+
+  <script>
+    const mostrar = (id) => {
+      document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+      document.getElementById(id).classList.add('activa');
+    };
+
+    // ---------- Pantalla 1: el NO se escapa y el SÍ crece ----------
+    const btnSi = document.getElementById('btn-si');
+    const btnNo = document.getElementById('btn-no');
+    const textosNo = ['NO', '¿Seguro?', '¿De verdad?', 'Piénsalo bien', 'No me hagas esto', '¡Venga ya!', 'Último aviso', 'Que no, que no'];
+    let intentos = 0;
+    let escala = 1;
+
+    function escaparNo(e) {
+      if (e) e.preventDefault();
+      intentos++;
+
+      // El SÍ crece con cada intento
+      escala = Math.min(escala + 0.35, 8);
+      btnSi.style.transform = `scale(${escala})`;
+
+      // El NO cambia de texto
+      btnNo.textContent = textosNo[intentos % textosNo.length];
+
+      // El NO salta a una posición aleatoria de la pantalla
+      if (btnNo.style.position !== 'fixed') {
+        const r = btnNo.getBoundingClientRect();
+        btnNo.style.position = 'fixed';
+        btnNo.style.left = r.left + 'px';
+        btnNo.style.top = r.top + 'px';
+      }
+      const margen = 12;
+      const ancho = btnNo.offsetWidth;
+      const alto = btnNo.offsetHeight;
+      const maxX = window.innerWidth - ancho - margen;
+      const maxY = window.innerHeight - alto - margen;
+      const si = btnSi.getBoundingClientRect();
+
+      let x, y, tries = 0;
+      do {
+        x = margen + Math.random() * Math.max(0, maxX - margen);
+        y = margen + Math.random() * Math.max(0, maxY - margen);
+        tries++;
+      } while (
+        tries < 30 &&
+        x < si.right && x + ancho > si.left && y < si.bottom && y + alto > si.top
+      );
+
+      btnNo.style.left = x + 'px';
+      btnNo.style.top = y + 'px';
+    }
+
+    btnNo.addEventListener('mouseenter', escaparNo);
+    btnNo.addEventListener('pointerdown', escaparNo);
+    btnNo.addEventListener('touchstart', escaparNo, { passive: false });
+    btnNo.addEventListener('click', escaparNo);   // por si llega con teclado
+    btnNo.addEventListener('focus', () => btnNo.blur());
+
+    btnSi.addEventListener('click', () => {
+      btnNo.style.display = 'none';
+      mostrar('p-planes');
+    });
+
+    // ---------- Pantalla 2: elegir plan ----------
+    const planes = document.querySelectorAll('.plan');
+    const otroWrap = document.getElementById('otro-wrap');
+    const otroTexto = document.getElementById('otro-texto');
+    const btnConfirmar = document.getElementById('btn-confirmar');
+    let planElegido = null;
+
+    function actualizarConfirmar() {
+      btnConfirmar.disabled = !planElegido ||
+        (planElegido === 'OTRO' && otroTexto.value.trim() === '');
+    }
+
+    planes.forEach(btn => {
+      btn.addEventListener('click', () => {
+        planes.forEach(b => b.classList.remove('elegido'));
+        btn.classList.add('elegido');
+        planElegido = btn.dataset.plan;
+        otroWrap.classList.toggle('visible', planElegido === 'OTRO');
+        if (planElegido === 'OTRO') otroTexto.focus();
+        actualizarConfirmar();
+      });
+    });
+    otroTexto.addEventListener('input', actualizarConfirmar);
+
+    btnConfirmar.addEventListener('click', () => {
+      const final = planElegido === 'OTRO' ? otroTexto.value.trim() : planElegido;
+      document.getElementById('plan-final').textContent = final;
+      const msg = `¡Sí! 🥰 Mi plan elegido es: ${final}`;
+      document.getElementById('btn-whatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      mostrar('p-fin');
+    });
+
+    document.getElementById('btn-volver').addEventListener('click', () => mostrar('p-planes'));
+  </script>
+</body>
+</html>
